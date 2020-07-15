@@ -1,5 +1,4 @@
 import db from "./connection";
-import logger from "../utils/logger";
 
 const customers = {
   create: `CREATE TABLE IF NOT EXISTS customers (
@@ -16,7 +15,7 @@ const customers = {
 
 const sellers = {
   create: `CREATE TABLE IF NOT EXISTS sellers (
-    customer_id INT AUTO_INCREMENT PRIMARY KEY,
+    seller_id INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
     first_name VARCHAR(255) NOT NULL,
     last_name VARCHAR(255) NOT NULL,
@@ -26,6 +25,33 @@ const sellers = {
     is_admin BOOLEAN DEFAULT FALSE
   );`,
   drop: `DROP TABLE IF EXISTS sellers CASCADE;`,
+};
+const carAds = {
+  create: `CREATE TABLE IF NOT EXISTS carads(
+  car_id INT AUTO_INCREMENT PRIMARY KEY,
+  owner INT REFFERENCES sellers(seller_id) ON DELETE CASCADE,
+  created_on TIMESTAMP DEFAULT NOW() ON UPDATE NOW(),
+  state  ENUM('new','used'),
+  status  ENUM ('sold','available') DEFAULT 'available',
+  price  FLOAT NOT NULL,
+  manufacturer  VARCHAR(255),
+  model  VARCHAR(255)
+  body_type VARCHAR(255) --car, truck, trailer, van, etc
+  );`,
+  drop: `DELETE TABLE IF EXISTS carads CASCADE;`,
+};
+
+const orders = {
+  create: `CREATE TABLE IF NOT EXISTS orders ( 
+  id  INT AUTO_INCREMENT PRIMARY KEY,
+  buyer INT REFFERENCES customers (customer_id),
+  seller INT REFFERENCES sellers (seller_id),
+  car_id INT REFFERNCES carads (car_id),
+  amount  FLOAT NOT NULL,
+  created_on TIMESTAMP DEFAULT NOW() ON UPDATE NOW(),
+  status ENUM('pending','accepted','rejected') DEFAULT 'pending'-- [pending, accepted, or rejected]
+  );`,
+  drop: `DROP TABLE  IF EXISTS orders CASCADE;`,
 };
 
 const createTableCustomer = () => {
@@ -37,18 +63,71 @@ const createTableCustomer = () => {
   });
 };
 const dropTableCustomer = async () => {
-  await db
-    .query(customers.drop)
-    .then((message) => {
-      logger.info({
-        message: `"customer table could not be deleted successfully${message}`,
-      });
-    })
-    .catch((err) => {
-      logger.info("something went wrongle while deleting customer table", err);
+  return new Promise(async (resolve, reject) => {
+    await db.query(customers.drop, (err, rows, fields) => {
+      if (!err)
+        return resolve({ message: "customers table deleted sucessfully" });
+      return reject(err);
     });
+  });
+};
+const createTableSellers = () => {
+  return new Promise(async (resolve, reject) => {
+    await db.query(sellers.create, (err, rows, fields) => {
+      if (!err) return resolve({ message: "sellers table created" });
+      return reject(err);
+    });
+  });
+};
+const dropTableSellers = async () => {
+  return new Promise(async (resolve, reject) => {
+    await db.query(sellers.drop, (err, rows, fields) => {
+      if (!err)
+        return resolve({ message: "sellers table deleted successully" });
+      return reject(err);
+    });
+  });
+};
+
+const createTableCarads = () => {
+  return new Promise(async (resolve, reject) => {
+    await db.query(carAds.create, (err, rows, fields) => {
+      if (!err) return resolve({ message: "carads table created" });
+      return reject(err);
+    });
+  });
+};
+const dropTableCarads = async () => {
+  return new Promise(async (resolve, reject) => {
+    await db.query(carAds.drop, (err, rows, fields) => {
+      if (!err) return resolve({ message: "carads table deleted successully" });
+      return reject(err);
+    });
+  });
+};
+const createTableOrders = () => {
+  return new Promise(async (resolve, reject) => {
+    await db.query(orders.create, (err, rows, fields) => {
+      if (!err) return resolve({ message: "orders table created" });
+      return reject(err);
+    });
+  });
+};
+const dropTableOrders = async () => {
+  return new Promise(async (resolve, reject) => {
+    await db.query(orders.drop, (err, rows, fields) => {
+      if (!err) return resolve({ message: "orders table deleted successully" });
+      return reject(err);
+    });
+  });
 };
 export default {
   createTableCustomer,
   dropTableCustomer,
+  createTableSellers,
+  dropTableSellers,
+  createTableCarads,
+  dropTableCarads,
+  createTableOrders,
+  dropTableOrders,
 };
