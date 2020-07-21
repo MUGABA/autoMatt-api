@@ -8,6 +8,6 @@ require("./utils//endPoints")(app);
 // require('./startup/logging')();
 // require('./startup/config')()
 // require('./database/tables')
-db.createTableCustomer();
+// db.createTableCustomer();
 const port = process.env.PORT || 5000;
 app.listen(port, () => logger.info(`listening to port ${port}`));
