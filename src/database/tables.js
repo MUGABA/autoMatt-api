@@ -27,29 +27,29 @@ const sellers = {
   drop: `DROP TABLE IF EXISTS sellers CASCADE;`,
 };
 const carAds = {
-  create: `CREATE TABLE IF NOT EXISTS carads(
+  create: `CREATE TABLE IF NOT EXISTS carads (
   car_id INT AUTO_INCREMENT PRIMARY KEY,
-  owner INT REFFERENCES sellers(seller_id) ON DELETE CASCADE,
+  owner INT REFERENCES sellers(seller_id) ON DELETE CASCADE,
   created_on TIMESTAMP DEFAULT NOW() ON UPDATE NOW(),
   state  ENUM('new','used'),
   status  ENUM ('sold','available') DEFAULT 'available',
   price  FLOAT NOT NULL,
   manufacturer  VARCHAR(255),
-  model  VARCHAR(255)
-  body_type VARCHAR(255) --car, truck, trailer, van, etc
+  model  VARCHAR(255),
+  body_type VARCHAR(255)
   );`,
-  drop: `DELETE TABLE IF EXISTS carads CASCADE;`,
+  drop: `DROP TABLE IF EXISTS carads CASCADE;`,
 };
 
 const orders = {
   create: `CREATE TABLE IF NOT EXISTS orders ( 
   id  INT AUTO_INCREMENT PRIMARY KEY,
-  buyer INT REFFERENCES customers (customer_id),
-  seller INT REFFERENCES sellers (seller_id),
-  car_id INT REFFERNCES carads (car_id),
+  buyer INT REFERENCES customers (customer_id) ON DELETE CASCADE,
+  seller INT REFERENCES sellers (seller_id) ON DELETE CASCADE,
+  car_id INT REFERENCES carads (car_id),
   amount  FLOAT NOT NULL,
   created_on TIMESTAMP DEFAULT NOW() ON UPDATE NOW(),
-  status ENUM('pending','accepted','rejected') DEFAULT 'pending'-- [pending, accepted, or rejected]
+  status ENUM('pending','accepted','rejected') DEFAULT 'pending'
   );`,
   drop: `DROP TABLE  IF EXISTS orders CASCADE;`,
 };
