@@ -113,6 +113,20 @@ const CarAdsContrals = {
 
     return res.status(200).send({ status: 200, data: getAll });
   },
+  async deleteSpecificCar(req, res) {
+    const carId = req.params.car_id;
+    const getCar = await Cars.getSpecificCarAd(carId);
+    if (!getCar)
+      return res
+        .status(404)
+        .send({ status: 404, message: "Car Ad of that id is not found" });
+
+    await Cars.removeSpecificCarAd(carId);
+
+    return res
+      .status(200)
+      .send({ status: 404, message: "Car deleted succussfully" });
+  },
 };
 
 export default CarAdsContrals;

@@ -73,6 +73,15 @@ const CarAdsModel = {
       });
     });
   },
+  removeSpecificCarAd(id) {
+    return new Promise(async (resolve, reject) => {
+      const text = "DELETE FROM carads WHERE car_id = ?";
+      await db.query(text, [id], (err, rows) => {
+        if (!err) return resolve(rows);
+        return reject(err);
+      });
+    });
+  },
 };
 
 export default CarAdsModel;
